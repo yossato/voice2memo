@@ -53,12 +53,12 @@ ffmpeg や whisper-cli が正しくインストールされ、パスが通って
 
 Configuration 以下のパスを自分の環境に合わせて変更してください
 
-    ```bash
-    AUDIO_DIR="/Users/USER/Library/Group Containers/group.com.apple.VoiceMemos.shared/Recordings"
-    TRANSCRIBE_DIR="/Users/USER/..."  # 文字起こし結果を保存するディレクトリ（例: テキストファイル保存先）
-    TEMP_DIR="/tmp/transcribe"         # 一時ファイル用ディレクトリ
-    MODEL=/.../whisper.cpp/models/ggml-large-v3-turbo-q5_0.bin  # Whisperモデルファイルのパス
-    ```
+```bash
+AUDIO_DIR="/Users/USER/Library/Group Containers/group.com.apple.VoiceMemos.shared/Recordings"
+TRANSCRIBE_DIR="/Users/USER/..."  # 文字起こし結果を保存するディレクトリ（例: テキストファイル保存先）
+TEMP_DIR="/tmp/transcribe"         # 一時ファイル用ディレクトリ
+MODEL=/.../whisper.cpp/models/ggml-large-v3-turbo-q5_0.bin  # Whisperモデルファイルのパス
+```
 
 ## 実行
 ```bash
