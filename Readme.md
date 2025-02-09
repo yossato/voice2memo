@@ -49,6 +49,7 @@ ffmpeg や whisper-cli が正しくインストールされ、パスが通って
     ```bash
     pip install whisper-cli
     ```
+詳しくは： https://github.com/vatsalaggarwal/whisper-cli
 
 - **ffmpeg**  
   音声ファイルのフォーマット変換に使用します。  
