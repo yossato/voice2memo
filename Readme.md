@@ -1,7 +1,7 @@
 # voice2memo
  Audio Transcription & Apple Notes Integration Script
 
-![](head.jpg)
+![](images/head.jpg)
 
 このスクリプトは、指定したディレクトリ内の音声ファイル（m4a形式）を自動で処理し、以下の一連の作業を行います。
 
@@ -35,7 +35,7 @@ mac上で、ボイスメモの格納ディレクトリにシェルScriptがア�
     アップルメニュー＞システム設定...>プライバシーとセキュリティ>フルディスクアクセス
 
     にターミナルを追加してアクセス許可する：
-![](screen.jpg)
+![](images/screen.jpg)
 
 
 ffmpeg や whisper-cli が正しくインストールされ、パスが通っていることを確認してください。
