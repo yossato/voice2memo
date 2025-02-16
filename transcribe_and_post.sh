@@ -7,6 +7,12 @@ TEMP_DIR="/tmp/transcribe"  # 一時ファイル用ディレクトリ
 # WhisperKit 用モデルファイルのパス（※環境に合わせて変更してください）
 MODEL="/Users/yoshiaki/Projects/whisperkit/Models/whisperkit-coreml/openai_whisper-large-v3-v20240930_626MB"
 
+# スクリプトと同じディレクトリにログファイルを配置
+SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+LOG_FILE="${SCRIPT_DIR}/transcribe.log"
+# ログファイルが存在しなければ作成（空ファイル）
+touch "$LOG_FILE"
+
 # 日時文字列を見やすい形式に変換する関数（例："20230415 123456" → "2023年4月15日 12時34分56秒"）
 format_datetime() {
     local dt=$1
@@ -27,12 +33,24 @@ format_datetime() {
 # 必要なディレクトリの作成
 mkdir -p "$TEMP_DIR" "$TRANSCRIBE_DIR"
 
+# ★ 事前処理: メモディレクトリに存在するテキストファイル名（basename）をログに追加
+for txt in "$TRANSCRIBE_DIR"/*.txt; do
+    [ -e "$txt" ] || continue  # マッチするファイルがない場合はスキップ
+    base=$(basename "$txt" .txt)
+    # ログファイルに存在しなければ追記
+    if ! grep -qx "$base" "$LOG_FILE"; then
+        echo "$base" >> "$LOG_FILE"
+    fi
+done
+
 # 各音声ファイルについて処理
 for audio_file in "$AUDIO_DIR"/*.m4a; do
     basename=$(basename "$audio_file" .m4a)
-    # 出力先ファイル（Notes 登録用テキスト）※すでに処理済みならスキップ
     txt_file="$TRANSCRIBE_DIR/${basename}.txt"
-    if [ -f "$txt_file" ]; then
+    
+    # ★ ログファイルに basename が登録済みなら、既に文字起こし済み（またはテキストが削除済み）と判断してスキップ
+    if grep -qx "$basename" "$LOG_FILE"; then
+        # echo "Skipping (already processed): $audio_file"
         continue
     fi
 
@@ -43,8 +61,6 @@ for audio_file in "$AUDIO_DIR"/*.m4a; do
     ffmpeg -i "$audio_file" -ar 16000 -ac 1 -c:a pcm_s16le "$wav_file" -y >/dev/null 2>&1
     
     # 2. 一時作業ディレクトリで whisperkit-cli を実行
-    #    brew でインストール済みのグローバルな whisperkit-cli を利用するため、
-    #    カレントディレクトリを一時ディレクトリに変更して実行します。
     pushd "$TEMP_DIR" >/dev/null
     whisperkit-cli transcribe --audio-path "$wav_file" --model-path "$MODEL" --language ja --report
     popd >/dev/null
@@ -93,10 +109,10 @@ EOF
     
     # 7. 後処理：一時ファイル（wav, srt, json）を削除
     json_file="$TEMP_DIR/${basename}.json"
+    rm "$wav_file" "$srt_file" "$json_file"
     
-    rm "$wav_file"
-    rm "$srt_file"
-    rm "$json_file"
+    # ★ 文字起こし実施後、ログファイルに basename を追記（重複は起こらない）
+    echo "$basename" >> "$LOG_FILE"
 done
 
 echo "All processing completed"
